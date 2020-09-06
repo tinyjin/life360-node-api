@@ -5,7 +5,7 @@ let DEBUG_FLAG = false;
 
 /**
  * Trys to create an integer from a variable of unknown type.
- * 
+ *
  * @param {any} x Unknown variable that might contain an integer.
  */
 function tryCreateInt(x) {
@@ -57,8 +57,8 @@ function tryCreateDate(x) {
 
 /**
  * Construct an object with lat and lon keys from a variable of unknown type.
- * 
- * @param {any} x 
+ *
+ * @param {any} x
  */
 function findLatLonFromVariable(x) {
   const latitudeMin = -90;
@@ -106,7 +106,7 @@ function findLatLonFromVariable(x) {
 class life360_helper {
   /**
    * Should be only used internally. Creates a helper object that will allow for communication with the Life360 API.
-   * @param {life360} api 
+   * @param {life360} api
    * @param {object} [props]
    */
   constructor(api, props) {
@@ -148,7 +148,7 @@ class life360_helper {
 
 /**
  * Represents a Life360 Location Request.
- * 
+ *
  * Use the check() method to ask the server for the status of the request.
  */
 class life360_location_request extends life360_helper {
@@ -496,6 +496,10 @@ class life360 {
     if (this._instance === undefined) this._instance = new life360();
     return this._instance.offenders.apply(this._instance, arguments);
   }
+  static myLocation() {
+    if (this._instance === undefined) this._instance = new life360();
+    return this._instance.getMyLocation.apply(this._instance, arguments);
+  }
   constructor() {
     this.BASIC_AUTH = 'Basic U3dlcUFOQWdFVkVoVWt1cGVjcmVrYXN0ZXFhVGVXckFTV2E1dXN3MzpXMnZBV3JlY2hhUHJlZGFoVVJhZ1VYYWZyQW5hbWVqdQ==';
     this.defaults = {
@@ -506,6 +510,15 @@ class life360 {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
       },
     };
+  }
+  async getMyLocation() {
+    var json = await this.request('/v3/circles');
+    var circleId = json.circles[0].id;
+
+    var json = await this.request('/v3/circles/' + circleId + '/members');
+    var member = json.members[0];
+
+    return member;
   }
   enableDebugging() {
     global.DEBUG_FLAG = true;
